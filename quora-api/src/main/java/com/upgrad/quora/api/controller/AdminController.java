@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 //AdminController is created for the delete user request.
-// Only admin can delete a uset.All the corresponding exception are hadnled and message are shown as per the requirement.
+// Only admin can delete a user.All the corresponding exception are handled and message are shown as per the requirement.
 
 
 @RestController
