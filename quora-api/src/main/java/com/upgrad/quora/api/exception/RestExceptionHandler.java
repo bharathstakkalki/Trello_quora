@@ -3,6 +3,7 @@ package com.upgrad.quora.api.exception;
 
 import com.upgrad.quora.api.model.ErrorResponse;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,14 @@ public class RestExceptionHandler {
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
                 HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidQuestionException.class)
+    public ResponseEntity<ErrorResponse> invalidQuestionException(InvalidQuestionException exc, WebRequest request){
+
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.NOT_FOUND);
     }
 }

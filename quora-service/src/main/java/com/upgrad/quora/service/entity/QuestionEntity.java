@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Table(name = "question")
 @NamedQueries({
 
-        @NamedQuery(name = "questionByUuid", query = "select q from QuestionEntity q where q.uuid = :uuid "),
+        @NamedQuery(name = "getQuestionByQuestionUuid", query = "select q from QuestionEntity q where q.uuid = :questionUuid "),
 
         @NamedQuery(name = "getAllQuestions", query = "select q from QuestionEntity q"),
 
