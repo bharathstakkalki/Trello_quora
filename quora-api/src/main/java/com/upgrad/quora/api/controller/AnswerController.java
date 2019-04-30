@@ -17,7 +17,7 @@ import java.util.List;
 //This Controller class deals with all the request related to question.
 
 @RestController
-@RequestMapping
+@RequestMapping("/")
 public class AnswerController {
 
     @Autowired
