@@ -46,4 +46,10 @@ public class QuestionDao {
         return questionEntity;
     }
 
+    // This method updates the question in the question table
+    public QuestionEntity editQuestion(final QuestionEntity questionEntity) {
+        entityManager.merge(questionEntity);
+        return questionEntity;
+    }
+
 }

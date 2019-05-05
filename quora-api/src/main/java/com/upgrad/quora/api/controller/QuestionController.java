@@ -1,12 +1,11 @@
 package com.upgrad.quora.api.controller;
 
 
-import com.upgrad.quora.api.model.QuestionDetailsResponse;
-import com.upgrad.quora.api.model.QuestionRequest;
-import com.upgrad.quora.api.model.QuestionResponse;
+import com.upgrad.quora.api.model.*;
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -88,6 +87,21 @@ public class QuestionController {
         QuestionEntity createdQuestion = questionBusinessService.createQuestion(questionEntity, authorization);
         QuestionResponse questionResponse = new QuestionResponse().id(createdQuestion.getUuid()).status("QUESTION CREATED");
         return  new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
+
+    }
+
+    // This Request handler method is used to handle Http requests of Put type. It receives the content that needs to be edited,
+    // the uuid of the question to be edited and the Authorization details (in the header) pertaining to the logged in user.
+    // A QuestionEntity object is created that stored the details present in the QuestionEditRequest and is sent to editQuestion() in
+    // QuestionBusinessService class to update the corresponding record in the database
+    @RequestMapping(method = RequestMethod.PUT, path = "/question/edit/{question_id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionEditResponse> editQuesttion(final QuestionEditRequest questionEditRequest, @PathVariable(value = "question_id") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setContent(questionEditRequest.getContent());
+        questionEntity.setDate(ZonedDateTime.now());
+        QuestionEntity editedQuestion = questionBusinessService.editQuestion(questionEntity, questionId, authorization);
+        QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
+        return new ResponseEntity<QuestionEditResponse>(questionEditResponse, HttpStatus.OK);
 
     }
 
