@@ -105,5 +105,15 @@ public class QuestionController {
 
     }
 
+    // This request handler method is used to handle http requests of Delete type. It receives the question id to be deleted
+    // and the access token (in the header) pertaining to the logged in user. This is passed to the deleteQuestion() in the QuestionBusinessService
+    // class which in turn deletes the entry from the database and returns the QuestionEntity object
+    @RequestMapping(method = RequestMethod.DELETE, path = "/question/delete/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@PathVariable(value = "questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity deletedQuestion = questionBusinessService.deleteQuestion(questionId, authorization);
+        QuestionDeleteResponse questionDeleteResponse = new QuestionDeleteResponse().id(deletedQuestion.getUuid()).status("QUESTION DELETED");
+        return new ResponseEntity<QuestionDeleteResponse>(questionDeleteResponse, HttpStatus.OK);
+    }
+
 
 }

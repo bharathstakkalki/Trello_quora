@@ -52,4 +52,10 @@ public class QuestionDao {
         return questionEntity;
     }
 
+    // This method deletes the corresponding question entry from the database and returns the questionEntity
+    public QuestionEntity deleteQuestion(final QuestionEntity questionEntity) {
+        entityManager.remove(questionEntity);
+        return questionEntity;
+    }
+
 }

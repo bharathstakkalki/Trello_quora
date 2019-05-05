@@ -124,4 +124,37 @@ public class QuestionBusinessService {
         return questionDao.editQuestion(questionToBeEdited);
     }
 
+    // This method checks if the question uuid passed is a valid one. It also verifies if the authorization token passes is valid and if the
+    // corresponding user is logged in. If any of the above mentioned criteria isn't met respective Exceptions are thrown.
+    // If the question uuid is valid and the authorization token is that of the owner of the question or of the admin user then the
+    // deleteQuestion() of the UserDao class is invoked which deletes the entry from the database
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity deleteQuestion( final String questionUuid, final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorization);
+        QuestionEntity deletedQuestion = null;
+        // Checks if it is a valid authorization token
+        if (userAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }
+        // Checks if the user is logged in
+        else if (userAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to delete a question");
+        }
+        QuestionEntity questionToBeDeleted = questionDao.getQuestionByQuestionUuid(questionUuid);
+        // Check for validity of question uuid
+        if (questionToBeDeleted == null) {
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }
+        UsersEntity questionUser =  userAuthEntity.getUser();
+        String role = questionUser.getRole();
+        // Deletes the question if the logged in user is the question owner or the user has admin role
+        if(questionUser == questionToBeDeleted.getUser() || role.equals("admin")) {
+            deletedQuestion = questionDao.deleteQuestion(questionToBeDeleted);
+        }
+        else {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
+        }
+        return deletedQuestion;
+    }
+
 }
