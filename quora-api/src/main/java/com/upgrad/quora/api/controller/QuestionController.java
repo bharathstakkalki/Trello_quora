@@ -2,6 +2,8 @@ package com.upgrad.quora.api.controller;
 
 
 import com.upgrad.quora.api.model.QuestionDetailsResponse;
+import com.upgrad.quora.api.model.QuestionRequest;
+import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
@@ -12,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 
 //This Controller class deals with all the request related to question.
@@ -71,5 +75,21 @@ public class QuestionController {
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionDetailsResponseList, HttpStatus.OK);
 
     }
+
+    // This Request handler method is used to handle Http requests of Post type. It receives the question entered by the user,
+    // creates the QuestionEntity object and correspondingly calls the createQuestion() in QuestionBusinessService class
+    // Exceptions arising due to scenarios when a user who isn't signed in, or has signed out tries to create a question has been handled
+    @RequestMapping(method = RequestMethod.POST, path="/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionResponse> createQuestion(final QuestionRequest questionRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setContent(questionRequest.getContent());
+        questionEntity.setDate(ZonedDateTime.now());
+        questionEntity.setUuid(UUID.randomUUID().toString());
+        QuestionEntity createdQuestion = questionBusinessService.createQuestion(questionEntity, authorization);
+        QuestionResponse questionResponse = new QuestionResponse().id(createdQuestion.getUuid()).status("QUESTION CREATED");
+        return  new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
+
+    }
+
 
 }

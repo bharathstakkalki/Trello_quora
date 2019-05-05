@@ -11,6 +11,8 @@ import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -73,4 +75,25 @@ public class QuestionBusinessService {
         return questionEntities;
     }
 
+    /*
+        The createQuestion() recieves the question content contained in the QuestionEntity object and tries to persist it in the database.
+        Care has been taken to check if the authorized user is performing the operation of question creation - i.e., only if the
+        authorization token passed is present in the database and if the user is logged in (i.e., the logout_at field of the user in the
+        user_auth table is not null can he proceed to create the question.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity createQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
+        UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
+
+        if(userAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }
+        else if (userAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
+        }
+        UsersEntity usersEntity = userAuthEntity.getUser();
+        questionEntity.setUser(usersEntity);
+        QuestionEntity createdQuestion = questionDao.createQuestion(questionEntity);
+        return createdQuestion;
+    }
 }
