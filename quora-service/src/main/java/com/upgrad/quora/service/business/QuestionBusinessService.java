@@ -76,22 +76,22 @@ public class QuestionBusinessService {
         return questionEntities;
     }
 
-    /*
-        The createQuestion() recieves the question content contained in the QuestionEntity object and tries to persist it in the database.
-        Care has been taken to check if the authorized user is performing the operation of question creation - i.e., only if the
-        authorization token passed is present in the database and if the user is logged in (i.e., the logout_at field of the user in the
-        user_auth table is not null can he proceed to create the question.
-     */
+    // The createQuestion() recieves the question content contained in the QuestionEntity object and tries to persist it in the database.
+    // Care has been taken to check if the authorized user is performing the operation of question creation - i.e., only if the
+    // authorization token passed is present in the database and if the user is logged in (i.e., the logout_at field of the user in the
+    // user_auth table is not null can he proceed to create the question.
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity createQuestion(final QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
-
+         // Checks if authorization token is valid
         if(userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
+        // Checks if the user is logged in 
         else if (userAuthEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
         }
+        // Creates the question and updates the database by calling the createQuestion() in QuestionDao class
         UsersEntity usersEntity = userAuthEntity.getUser();
         questionEntity.setUser(usersEntity);
         QuestionEntity createdQuestion = questionDao.createQuestion(questionEntity);
@@ -104,18 +104,21 @@ public class QuestionBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity editQuestion(final QuestionEntity questionEntity, final String questionUuid, final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorization);
+        // Checks if authorization token is valid
         if (userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
+        // Checks if the user is logged in 
         else if (userAuthEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to edit the question");
         }
-
         QuestionEntity questionToBeEdited = questionDao.getQuestionByQuestionUuid(questionUuid);
         UsersEntity usersEntity = userAuthEntity.getUser();
+        // Checks if the passed question uuid is valid
         if(questionToBeEdited == null) {
             throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
         }
+        // Checks if the user editing the question is the owner of the question
         else if (questionToBeEdited.getUser() != usersEntity) {
             throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
         }
