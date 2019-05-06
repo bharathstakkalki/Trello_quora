@@ -1,0 +1,22 @@
+-------------------------------------------------------------------------------
+Test set: com.upgrad.quora.api.controller.UserControllerTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 11.285 s <<< FAILURE! - in com.upgrad.quora.api.controller.UserControllerTest
+signupWithRepeatedEmail(com.upgrad.quora.api.controller.UserControllerTest)  Time elapsed: 0.52 s  <<< ERROR!
+org.springframework.web.util.NestedServletException: Request processing failed; nested exception is com.upgrad.quora.service.exception.SignUpRestrictedException
+	at com.upgrad.quora.api.controller.UserControllerTest.signupWithRepeatedEmail(UserControllerTest.java:35)
+Caused by: com.upgrad.quora.service.exception.SignUpRestrictedException
+	at com.upgrad.quora.api.controller.UserControllerTest.signupWithRepeatedEmail(UserControllerTest.java:35)
+
+signoutWithNonExistingAccessToken(com.upgrad.quora.api.controller.UserControllerTest)  Time elapsed: 0.138 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<401> but was:<404>
+	at com.upgrad.quora.api.controller.UserControllerTest.signoutWithNonExistingAccessToken(UserControllerTest.java:45)
+
+signupWithRepeatedUserName(com.upgrad.quora.api.controller.UserControllerTest)  Time elapsed: 0.122 s  <<< ERROR!
+org.springframework.web.util.NestedServletException: Request processing failed; nested exception is org.springframework.dao.InvalidDataAccessApiUsageException: No EntityManager with actual transaction available for current thread - cannot reliably process 'persist' call; nested exception is javax.persistence.TransactionRequiredException: No EntityManager with actual transaction available for current thread - cannot reliably process 'persist' call
+	at com.upgrad.quora.api.controller.UserControllerTest.signupWithRepeatedUserName(UserControllerTest.java:27)
+Caused by: org.springframework.dao.InvalidDataAccessApiUsageException: No EntityManager with actual transaction available for current thread - cannot reliably process 'persist' call; nested exception is javax.persistence.TransactionRequiredException: No EntityManager with actual transaction available for current thread - cannot reliably process 'persist' call
+	at com.upgrad.quora.api.controller.UserControllerTest.signupWithRepeatedUserName(UserControllerTest.java:27)
+Caused by: javax.persistence.TransactionRequiredException: No EntityManager with actual transaction available for current thread - cannot reliably process 'persist' call
+	at com.upgrad.quora.api.controller.UserControllerTest.signupWithRepeatedUserName(UserControllerTest.java:27)
+
