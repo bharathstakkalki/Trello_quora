@@ -1,7 +1,6 @@
 package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.UserAuthEntity;
-import com.upgrad.quora.service.entity.UsersEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -28,5 +27,15 @@ public class UserAuthDao {
         }catch(NoResultException nre){
             return null;
         }
+    }
+
+    /**
+     * This method is used to persist the User Authorization Token i.e. JWT in the database.
+     * @param userAuthEntity
+     * @return UserAuthEntity Object
+     */
+    public UserAuthEntity createAuthToken(UserAuthEntity userAuthEntity) {
+        entityManager.persist(userAuthEntity);
+        return userAuthEntity;
     }
 }
