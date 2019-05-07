@@ -1,4 +1,4 @@
 
-.idea\*
-quora-api\target\*
-quora-service\target\*
+.idea/*
+quora-api/target/*
+quora-service/target/*
