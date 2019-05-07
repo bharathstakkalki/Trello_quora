@@ -7,11 +7,15 @@ import com.upgrad.quora.service.dao.UserAuthDao;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 //This is service class for AnswerController.
@@ -52,6 +56,31 @@ public class AnswerBusinessService {
         //Returning the List of AnswerEntity to the calling method.
         List<AnswerEntity> answerEntities = answerDao.getAllAnswerToQuestion(questionEntity);
         return answerEntities;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AnswerEntity editAnsContents(AnswerEntity ansEditEntity, final String answerUuid, final String authorizationToken) throws AuthorizationFailedException, AnswerNotFoundException {
+
+        AnswerEntity answerEntity = answerDao.getAnswerByAnswerUuid(answerUuid);
+        if(answerEntity == null){
+            throw new AnswerNotFoundException("ANS-001","Entered answer uuid does not exist");
+        }
+
+        UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
+
+        if (userAuthEntity == null){//Chekcing if user is not signed in
+            throw new AuthorizationFailedException("ATHR-001","User has not signed in");
+        }else if (userAuthEntity.getLogoutAt() != null){//checking if user is signed out
+            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit an answer");
+        }
+
+        if(userAuthEntity.getUser() != answerEntity.getUser()){
+            throw new AuthorizationFailedException("ATHR-003","Only the answer owner can edit the answer");
+        }
+        ansEditEntity.setDate(ZonedDateTime.now());
+        ansEditEntity.setUser(userAuthEntity.getUser());
+        return answerDao.editAnsContents(ansEditEntity);
+
     }
 
 }
