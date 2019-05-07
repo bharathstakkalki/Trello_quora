@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users", uniqueConstraints ={@UniqueConstraint(columnNames = {"userName","email"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"userName", "email"})})
 
 @NamedQueries(
         {
@@ -28,7 +28,7 @@ public class UsersEntity implements Serializable {
     private Integer id;
 
     @Column(name = "uuid")
-    @Size( max = 200)
+    @Size(max = 200)
     @NotNull
     private String uuid;
 

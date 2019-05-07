@@ -2,12 +2,14 @@ package com.upgrad.quora.api.controller;
 
 
 import com.upgrad.quora.api.model.SigninResponse;
+import com.upgrad.quora.api.model.SignoutResponse;
 import com.upgrad.quora.api.model.SignupUserRequest;
 import com.upgrad.quora.api.model.SignupUserResponse;
 import com.upgrad.quora.service.business.UserBusinessService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UsersEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +36,7 @@ public class UserController {
      * and translates it into the UsersEntity object. Then it makes a call to the service method for creating
      * a new User. Once it receives the response it create the SignupUserResponse object that is to be sent in
      * the Response Body.
+     *
      * @param signupUserRequest
      * @return
      * @throws SignUpRestrictedException
@@ -63,6 +66,7 @@ public class UserController {
      * This method decodes the contents of the Authorization Header using Base 64 decode method and then calls the
      * service method which is supposed to Authenticate the user using the given Username and Password in the
      * Authorization Header. It gives the 200 OK Response once user is signed in.
+     *
      * @param authorization - Passed in Request Header as Basic Authentication
      * @return
      */
@@ -77,5 +81,21 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("access_token", userAuthEntity.getAccessToken());
         return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
+    }
+
+    /**
+     * Method to implement User Sign out Endpoint. It calls the signOut service method which implements the sign out
+     * functionality and constructs the SignoutResponse object with the Signedout user's UUID. If successful it returns
+     * the message "SIGNED OUT SUCCESSFULLY"
+     *
+     * @param authorization
+     * @return
+     */
+    @RequestMapping(path = "/user/signout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SignoutResponse> userSignOut(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException {
+        UserAuthEntity userAuthEntity = userBusinessService.signOut(authorization);
+        UsersEntity usersEntity = userAuthEntity.getUser();
+        SignoutResponse signoutResponse = new SignoutResponse().id(usersEntity.getUuid()).message("SIGNED OUT SUCCESSFULLY");
+        return new ResponseEntity<SignoutResponse>(signoutResponse, HttpStatus.OK);
     }
 }

@@ -17,7 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 public class RestExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> userNotFoundException(UserNotFoundException exc , WebRequest request){
+    public ResponseEntity<ErrorResponse> userNotFoundException(UserNotFoundException exc, WebRequest request) {
 
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
@@ -26,7 +26,7 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(AuthorizationFailedException.class)
-    public ResponseEntity<ErrorResponse> authorizationFailedException(AuthorizationFailedException exc , WebRequest request){
+    public ResponseEntity<ErrorResponse> authorizationFailedException(AuthorizationFailedException exc, WebRequest request) {
 
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
@@ -35,7 +35,7 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(InvalidQuestionException.class)
-    public ResponseEntity<ErrorResponse> invalidQuestionException(InvalidQuestionException exc, WebRequest request){
+    public ResponseEntity<ErrorResponse> invalidQuestionException(InvalidQuestionException exc, WebRequest request) {
 
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
@@ -44,7 +44,7 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(SignUpRestrictedException.class)
-    public ResponseEntity<ErrorResponse> signUpRestrictedException(SignUpRestrictedException exc, WebRequest request){
+    public ResponseEntity<ErrorResponse> signUpRestrictedException(SignUpRestrictedException exc, WebRequest request) {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),
@@ -52,7 +52,15 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationFailedException.class)
-    public ResponseEntity<ErrorResponse> authenticationFailedException(AuthenticationFailedException exc, WebRequest request){
+    public ResponseEntity<ErrorResponse> authenticationFailedException(AuthenticationFailedException exc, WebRequest request) {
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+                .code(exc.getCode())
+                .message(exc.getErrorMessage()),
+                HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(SignOutRestrictedException.class)
+    public ResponseEntity<ErrorResponse> signOutRestrictedException(SignOutRestrictedException exc, WebRequest request) {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse()
                 .code(exc.getCode())
                 .message(exc.getErrorMessage()),

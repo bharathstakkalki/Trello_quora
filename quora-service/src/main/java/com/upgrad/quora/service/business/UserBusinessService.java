@@ -5,6 +5,7 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UsersEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class UserBusinessService {
      * Service Method to implement the Create User Functionality. It takes the UsersEntity Object as input
      * and checks if the given User name or the given email exists in the database or not. If it does
      * it throws SignUpRestrictedException with respective message.
+     *
      * @param usersEntity - Type UsersEntity
      * @return UserEntity - After persisting in Database
      * @throws SignUpRestrictedException
@@ -37,24 +39,25 @@ public class UserBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UsersEntity createUser(UsersEntity usersEntity) throws SignUpRestrictedException {
         UsersEntity usersEntityByName = userDao.getUserByUsername(usersEntity.getUserName());
-        if(userDao.getUserByUsername(usersEntity.getUserName())!=null){
+        if (userDao.getUserByUsername(usersEntity.getUserName()) != null) {
             throw new SignUpRestrictedException("SGR-001", "Try any other Username, this Username has already been taken");
         }
-        if(userDao.getUserByEmail(usersEntity.getEmail())!= null){
+        if (userDao.getUserByEmail(usersEntity.getEmail()) != null) {
             throw new SignUpRestrictedException("SGR-002", "This user has already been registered, try with any other emailId");
         }
 
-            String[] encryptedPassword = passwordCryptographyProvider.encrypt(usersEntity.getPassword());
-            usersEntity.setSalt(encryptedPassword[0]);
-            usersEntity.setPassword(encryptedPassword[1]);
-            userDao.createUser(usersEntity);
-            return usersEntity;
+        String[] encryptedPassword = passwordCryptographyProvider.encrypt(usersEntity.getPassword());
+        usersEntity.setSalt(encryptedPassword[0]);
+        usersEntity.setPassword(encryptedPassword[1]);
+        userDao.createUser(usersEntity);
+        return usersEntity;
 
     }
 
     /**
      * The Service method used for Authenticating the user with given Username and Password. It checks if Username
      * and password is correct or not, if not it gives Unauthorized Exception.
+     *
      * @param username
      * @param password
      * @return Object of Type UserAuthEntity
@@ -63,11 +66,11 @@ public class UserBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity authenticateUser(String username, String password) throws AuthenticationFailedException {
         UsersEntity user = userDao.getUserByUsername(username);
-        if(user == null){
+        if (user == null) {
             throw new AuthenticationFailedException("ATH-001", "This username does not exist");
         }
         String encryptedPassword = passwordCryptographyProvider.encrypt(password, user.getSalt());
-        if(encryptedPassword.equals(user.getPassword())){
+        if (encryptedPassword.equals(user.getPassword())) {
             JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
             UserAuthEntity userAuthEntity = new UserAuthEntity();
             userAuthEntity.setUser(user);
@@ -82,8 +85,26 @@ public class UserBusinessService {
             userAuthDao.createAuthToken(userAuthEntity);
 
             return userAuthEntity;
-        }else {
+        } else {
             throw new AuthenticationFailedException("ATH-002", "Password failed");
         }
+    }
+
+    /**
+     * This service method implements the business logic for the user sign out. It checks whether the given access token
+     * exists in the database or not. If it does then the Logout time is set in the UserAuthEntity Object and persisted
+     * in the database.
+     *
+     * @param accessToken
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthEntity signOut(String accessToken) throws SignOutRestrictedException {
+        UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(accessToken);
+        if (userAuthEntity == null) {
+            throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
+        }
+        userAuthEntity.setLogoutAt(ZonedDateTime.now());
+        return userAuthDao.logOut(userAuthEntity);
     }
 }
