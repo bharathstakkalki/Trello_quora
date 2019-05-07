@@ -22,4 +22,9 @@ public class AnswerDao {
         List<AnswerEntity> answerEntities = entityManager.createNamedQuery("getAllAnswerToQuestion",AnswerEntity.class).setParameter("question",questionEntity).getResultList();
         return answerEntities;
     }
+
+    public AnswerEntity createAnswer(AnswerEntity answerEntity){
+        entityManager.persist(answerEntity);
+        return answerEntity;
+    }
 }

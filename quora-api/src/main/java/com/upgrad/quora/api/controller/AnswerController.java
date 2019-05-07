@@ -1,6 +1,8 @@
 package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.AnswerDetailsResponse;
+import com.upgrad.quora.api.model.AnswerRequest;
+import com.upgrad.quora.api.model.AnswerResponse;
 import com.upgrad.quora.service.business.AnswerBusinessService;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 //This Controller class deals with all the request related to question.
 
@@ -43,6 +46,21 @@ public class AnswerController {
         }
 
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerResponse> createAnswer(final AnswerRequest answerRequest, @PathVariable(value = "questionId")final String questionUuid,
+                                                       @RequestHeader(value = "authorization")final String authorization) throws InvalidQuestionException, AuthorizationFailedException {
+
+        AnswerEntity answerEntity = new AnswerEntity();
+        answerEntity.setUuid(UUID.randomUUID().toString());
+        answerEntity.setAns(answerRequest.getAnswer());
+        AnswerEntity createdAnswer = answerBusinessService.createAnswer(answerEntity, questionUuid, authorization);
+
+        final AnswerResponse createdAnswerResponse = new AnswerResponse().id(createdAnswer.getUuid()).status("ANSWER CREATED");
+
+        return new ResponseEntity<AnswerResponse>(createdAnswerResponse, HttpStatus.CREATED);
+
     }
 
 
