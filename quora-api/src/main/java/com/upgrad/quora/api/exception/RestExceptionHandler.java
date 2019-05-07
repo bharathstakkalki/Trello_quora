@@ -66,4 +66,14 @@ public class RestExceptionHandler {
                 .message(exc.getErrorMessage()),
                 HttpStatus.UNAUTHORIZED);
     }
+
+//    @ExceptionHandler(AuthorizationFailedException.class)
+//    public ResponseEntity<ErrorResponse> userAuthorizationFailedException(AuthorizationFailedException exc, WebRequest request){
+//        return new ResponseEntity<ErrorResponse>(new ErrorResponse()
+//                .code(exc.getCode())
+//                .message(exc.getErrorMessage()),
+//                HttpStatus.UNAUTHORIZED);
+//    }
+
+
 }
