@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,10 @@ public class AnswerController {
     }
 
     //Endpoint to create an answer to question. Any user can access this end point
+    //This method takes answerRequest in JSON model format, questionId whose answer is to be created and authorization details
+    //And passes it to service class.
+    //It returns the createdAnswer record in the JSON response model format from the answer table along with the http status code
+    //Also it handles exceptions and sends appropriate error codes and messages
     @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerResponse> createAnswer(final AnswerRequest answerRequest, @PathVariable(value = "questionId")final String questionUuid,
                                                        @RequestHeader(value = "authorization")final String authorization) throws InvalidQuestionException, AuthorizationFailedException {
@@ -57,6 +62,7 @@ public class AnswerController {
         AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setUuid(UUID.randomUUID().toString());
         answerEntity.setAns(answerRequest.getAnswer());
+        answerEntity.setDate(ZonedDateTime.now());
 
         AnswerEntity createdAnswer = answerBusinessService.createAnswer(answerEntity, questionUuid, authorization);
 

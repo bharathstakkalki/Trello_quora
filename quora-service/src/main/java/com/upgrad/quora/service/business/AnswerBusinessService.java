@@ -56,20 +56,24 @@ public class AnswerBusinessService {
         return answerEntities;
     }
 
+    // Method checks for different conditions for creating answer to the particular question
+    //it takes the questionId whose answer is to be created, the answer entity and authorization details passed by controller
     @Transactional(propagation = Propagation.REQUIRED)
     public AnswerEntity createAnswer(AnswerEntity answerEntity, final String questionUuid, final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
+        // code checks for user is not signed in OR not??
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
-        if (userAuthEntity == null) {//Chekcing if user is not signed in
+        if (userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         } else if (userAuthEntity.getLogoutAt() != null) {//checking if user is signed out
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post an answer");
         }
-
+        //check for the questionId entered/given is vaild OR not??
         QuestionEntity questionEntity = questionDao.getQuestionByQuestionUuid(questionUuid);
         if (questionEntity == null) { //checking if entered questionId is valid??
             throw new InvalidQuestionException("QUES-001", "The question entered is invalid");
         }
 
+        answerEntity.setUser(userAuthEntity.getUser());
         answerEntity.setQuestion(questionEntity);
         return answerDao.createAnswer(answerEntity);
     }
