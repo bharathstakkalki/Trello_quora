@@ -66,7 +66,7 @@ public class AnswerBusinessService {
         }
 
         QuestionEntity questionEntity = questionDao.getQuestionByQuestionUuid(questionUuid);
-        if (questionEntity == null) {
+        if (questionEntity == null) { //checking if entered questionId is valid??
             throw new InvalidQuestionException("QUES-001", "The question entered is invalid");
         }
 

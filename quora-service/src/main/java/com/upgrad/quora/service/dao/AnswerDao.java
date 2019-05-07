@@ -23,6 +23,8 @@ public class AnswerDao {
         return answerEntities;
     }
 
+    //This method stores the answer and other relalated parameters in the answer table for a question and returns
+    // the stored answer and other related parameters from answer table
     public AnswerEntity createAnswer(AnswerEntity answerEntity){
         entityManager.persist(answerEntity);
         return answerEntity;

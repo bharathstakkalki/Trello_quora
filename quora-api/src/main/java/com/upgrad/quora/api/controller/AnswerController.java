@@ -48,13 +48,16 @@ public class AnswerController {
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
     }
 
+    //Endpoint to create an answer to question. Any user can access this end point
     @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerResponse> createAnswer(final AnswerRequest answerRequest, @PathVariable(value = "questionId")final String questionUuid,
                                                        @RequestHeader(value = "authorization")final String authorization) throws InvalidQuestionException, AuthorizationFailedException {
 
+        //This code will transform JSON request model to entity
         AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setUuid(UUID.randomUUID().toString());
         answerEntity.setAns(answerRequest.getAnswer());
+
         AnswerEntity createdAnswer = answerBusinessService.createAnswer(answerEntity, questionUuid, authorization);
 
         final AnswerResponse createdAnswerResponse = new AnswerResponse().id(createdAnswer.getUuid()).status("ANSWER CREATED");
