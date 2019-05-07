@@ -47,11 +47,16 @@ public class AnswerController {
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
     }
 
+    //This end point is to delete an answer with permissions that only answer owner OR admin can delete the answer
+    //Method takes answerID and authorization and passes it to the service class
+    //It gives you back the deleted record from the answer table in the form of JSON model format along with the httpstatus
+    //It also handles the exceptions and returns the generated error codes and messages
+
     @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
          public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@PathVariable(value = "answerId")final String answerId, @RequestHeader("authorization")final String authorization)throws AuthorizationFailedException, AnswerNotFoundException {
-             final AnswerEntity deletedAns = answerBusinessService.deleteAnswer(answerId, authorization);
-             AnswerDeleteResponse  deletedAnsResponse = new AnswerDeleteResponse().id(deletedAns.getUuid()).status("ANSWER DELETED");
-             return new ResponseEntity<AnswerDeleteResponse>(deletedAnsResponse,HttpStatus.OK);
+            final AnswerEntity deletedAns = answerBusinessService.deleteAnswer(answerId, authorization);
+            AnswerDeleteResponse  deletedAnsResponse = new AnswerDeleteResponse().id(deletedAns.getUuid()).status("ANSWER DELETED");
+            return new ResponseEntity<AnswerDeleteResponse>(deletedAnsResponse,HttpStatus.OK);
     }
 
 }
