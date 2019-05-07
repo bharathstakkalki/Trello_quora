@@ -58,25 +58,32 @@ public class AnswerBusinessService {
         return answerEntities;
     }
 
+    //This method takes answer entity, answerId and authorization information from controller class and returns edited answerentity
     @Transactional(propagation = Propagation.REQUIRED)
     public AnswerEntity editAnsContents(AnswerEntity ansEditEntity, final String answerUuid, final String authorizationToken) throws AuthorizationFailedException, AnswerNotFoundException {
+
+        //This code checks for the answerId exists OR not.. if not it throws answerNotFound exception
 
         AnswerEntity answerEntity = answerDao.getAnswerByAnswerUuid(answerUuid);
         if(answerEntity == null){
             throw new AnswerNotFoundException("ANS-001","Entered answer uuid does not exist");
         }
 
+        //This code checks if user is not signed in
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
 
-        if (userAuthEntity == null){//Chekcing if user is not signed in
+        if (userAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001","User has not signed in");
-        }else if (userAuthEntity.getLogoutAt() != null){//checking if user is signed out
+        }else if (userAuthEntity.getLogoutAt() != null){              //checking if user is signed out
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit an answer");
         }
 
+        //Check for the logged in user whether is answer owner??
         if(userAuthEntity.getUser() != answerEntity.getUser()){
             throw new AuthorizationFailedException("ATHR-003","Only the answer owner can edit the answer");
         }
+
+        //updating the entity with parametes like date and user...
         ansEditEntity.setDate(ZonedDateTime.now());
         ansEditEntity.setUser(userAuthEntity.getUser());
         return answerDao.editAnsContents(ansEditEntity);

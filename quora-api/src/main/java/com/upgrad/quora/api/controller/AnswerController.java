@@ -50,10 +50,17 @@ public class AnswerController {
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
     }
 
+    //This end point is for editing an answer.
+    //It allows editing only to the answer owner
+    //This method returns the edited answer in the form of JSON response model AnswerEditResponse with Http status
+    //Method takes JSON request model from client, path variable answerId and the authorization and passes it to service layer for authentication.
+    //Also it handles AuthorizationFailedExceptions & AnswerNotFoundException and returns them with appropriate messages & codes
+
     @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerEditResponse> editAnswerContent(final AnswerEditRequest answerEditRequest, @PathVariable(value = "answerId") final String answerId,
                                                                 @RequestHeader(value = "authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
 
+        //This code transforms JSON model to entity model
         AnswerEntity ansEditEntity = new AnswerEntity();
         ansEditEntity.setUuid(UUID.randomUUID().toString());
         ansEditEntity.setAns(answerEditRequest.getContent());
