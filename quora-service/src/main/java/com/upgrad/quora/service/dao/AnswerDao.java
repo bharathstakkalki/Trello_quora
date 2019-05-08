@@ -35,7 +35,7 @@ public class AnswerDao {
 
     //Method to update / edit the answer. Takes the answer to be updated and all other entity parameters and updates into the answer table in the database and
     //returns the updated record from answer table.
-    public AnswerEntity editAnsContents(AnswerEntity ansEditEntity){
+    public AnswerEntity editAnsContents(final AnswerEntity ansEditEntity){
         entityManager.merge(ansEditEntity);
         return ansEditEntity;
     }

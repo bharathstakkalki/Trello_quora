@@ -39,19 +39,19 @@ public class AnswerBusinessService {
     //If the condition are passed then the Question is fetched from the Question table using QuestionDao.
     //If the Question exists then Answer list is fetched using AnswerDao Method getAllAnswerToQuestion by passing the particular question.
 
-    public List<AnswerEntity> getAllAnswerToQuestion(final String questionUuid,final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
+    public List<AnswerEntity> getAllAnswerToQuestion(final String questionUuid, final String authorizationToken) throws AuthorizationFailedException, InvalidQuestionException {
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
 
-        if (userAuthEntity == null){//Chekcing if user is not signed in
-            throw new AuthorizationFailedException("ATHR-001","User has not signed in");
-        }else if (userAuthEntity.getLogoutAt() != null){//checking if user is signed out
-            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get the answers");
+        if (userAuthEntity == null) {//Chekcing if user is not signed in
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        } else if (userAuthEntity.getLogoutAt() != null) {//checking if user is signed out
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get the answers");
         }
 
         QuestionEntity questionEntity = questionDao.getQuestionByQuestionUuid(questionUuid);
 
-        if(questionEntity == null){
-            throw new InvalidQuestionException("QUES-001","The question with entered uuid whose details are to be seen does not exist");
+        if (questionEntity == null) {
+            throw new InvalidQuestionException("QUES-001", "The question with entered uuid whose details are to be seen does not exist");
         }
         //Returning the List of AnswerEntity to the calling method.
         List<AnswerEntity> answerEntities = answerDao.getAllAnswerToQuestion(questionEntity);
@@ -62,33 +62,32 @@ public class AnswerBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public AnswerEntity editAnsContents(AnswerEntity ansEditEntity, final String answerUuid, final String authorizationToken) throws AuthorizationFailedException, AnswerNotFoundException {
 
-        //This code checks for the answerId exists OR not.. if not it throws answerNotFound exception
-
-        AnswerEntity answerEntity = answerDao.getAnswerByAnswerUuid(answerUuid);
-        if(answerEntity == null){
-            throw new AnswerNotFoundException("ANS-001","Entered answer uuid does not exist");
-        }
-
         //This code checks if user is not signed in
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
 
-        if (userAuthEntity == null){
-            throw new AuthorizationFailedException("ATHR-001","User has not signed in");
-        }else if (userAuthEntity.getLogoutAt() != null){              //checking if user is signed out
-            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit an answer");
+        if (userAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        } else if (userAuthEntity.getLogoutAt() != null) {              //checking if user is signed out
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to edit an answer");
         }
 
-        //Check for the logged in user whether is answer owner??
-        if(userAuthEntity.getUser() != answerEntity.getUser()){
-            throw new AuthorizationFailedException("ATHR-003","Only the answer owner can edit the answer");
-        }
+        //This code checks for the answerId exists OR not.. if not it throws answerNotFound exception
 
-        //updating the entity with parametes like date and user...
-        ansEditEntity.setDate(ZonedDateTime.now());
-        ansEditEntity.setUser(userAuthEntity.getUser());
-        ansEditEntity.setQuestion(answerEntity.getQuestion());
-        return answerDao.editAnsContents(ansEditEntity);
+        AnswerEntity answerEntity = answerDao.getAnswerByAnswerUuid(answerUuid);
+        if (answerEntity == null) {
+            throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
+        } else
+            //Check for the logged in user whether is answer owner??
+            if (userAuthEntity.getUser() != answerEntity.getUser()) {
+                throw new AuthorizationFailedException("ATHR-003", "Only the answer owner can edit the answer");
+            } else {
+
+                //updating the entity with parametes like date and user...
+                answerEntity.setAns(ansEditEntity.getAns());
+                answerEntity.setDate(ZonedDateTime.now());
+                return answerDao.editAnsContents(answerEntity);
+
+            }
 
     }
-
 }
