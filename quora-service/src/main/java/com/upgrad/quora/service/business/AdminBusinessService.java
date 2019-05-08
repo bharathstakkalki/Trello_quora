@@ -24,26 +24,33 @@ public class AdminBusinessService {
     //If all condition are satisfied then the user is allowed to fetch the details of the user to deleted and the user is deleted.
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UsersEntity deleteUser(final String uuid,final String authorizationToken)throws UserNotFoundException,AuthorizationFailedException{
+    public UsersEntity deleteUser(final String uuid,final String authorizationToken)throws UserNotFoundException,AuthorizationFailedException {
         UserAuthEntity userAuthEntity = adminDao.getAuthToken(authorizationToken);
 
         if (userAuthEntity == null) {//checking if user is not signed in.
-            throw new AuthorizationFailedException("ATHR-001","User has not signed in");
-        }else if (userAuthEntity.getLogoutAt()!= null) {//checking if user is signedout.
-            throw new AuthorizationFailedException("ATHR-002", "User is signed out");
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
 
         String role = userAuthEntity.getUser().getRole();
 
-        if(role.equals("admin")) {//checking if the role of the user is admin.
+        if (role.equals("admin")) {//checking if the role of the user is admin.
+
+            if (userAuthEntity.getLogoutAt() != null) {//checking if user is signedout.
+                throw new AuthorizationFailedException("ATHR-002", "User is signed out");
+            }
+
             UsersEntity deletedUser = adminDao.deleteUser(uuid);
+
+
             if (deletedUser == null) {//checking if the user to be deleted exist in the user table.
                 throw new UserNotFoundException("USR-001", "User with entered uuid to be deleted does not exist");
             }
+
             return deletedUser;
         }
-        throw new AuthorizationFailedException("ATHR-003","Unauthorized Access, Entered user is not an admin");
-    }
+        throw new AuthorizationFailedException("ATHR-003", "Unauthorized Access, Entered user is not an admin");
 
+
+    }
 
 }
