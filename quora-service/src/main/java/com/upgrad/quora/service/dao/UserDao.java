@@ -31,6 +31,48 @@ public class UserDao {
         }
     }
 
+    /**
+     * This method fetches the User Entity Object having Username property as the given parameter by calling
+     * the corresponding Named Query
+     * @param username
+     * @return
+     */
+    public UsersEntity getUserByUsername(final String username){
+        try {
+            UsersEntity user = entityManager.createNamedQuery("userByUsername", UsersEntity.class).setParameter("username", username).getSingleResult();
+            return user;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
+    /**
+     * This method fetches the User Entity Object having email property as the given parameter by calling
+     * the corresponding Named Query
+     * @param email
+     * @return
+     */
+    public UsersEntity getUserByEmail(final String email){
+        try {
+            UsersEntity user = entityManager.createNamedQuery("userByEmail", UsersEntity.class).setParameter("email", email).getSingleResult();
+            return user;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
+    /**
+     * This method simply persists the received UsersEntity object in the database and returns the persisted
+     * object.
+     * @param usersEntity
+     * @return
+     */
+    public UsersEntity createUser(UsersEntity usersEntity){
+        entityManager.persist(usersEntity);
+        return usersEntity;
+    }
+
+
 
 
 }

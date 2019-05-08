@@ -1,6 +1,8 @@
 package com.upgrad.quora.service.entity;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.persistence.*;
@@ -12,9 +14,12 @@ import java.io.Serializable;
 @Table(name = "users", uniqueConstraints ={@UniqueConstraint(columnNames = {"userName","email"})})
 
 @NamedQueries(
-                {@NamedQuery(name = "userByUuid", query = "select u from UsersEntity u where u.uuid = :uuid")}
-
-                 )
+        {
+                @NamedQuery(name = "userByUuid", query = "select u from UsersEntity u where u.uuid = :uuid"),
+                @NamedQuery(name = "userByUsername", query = "select u from UsersEntity u where u.userName = :username"),
+                @NamedQuery(name = "userByEmail", query = "select u from UsersEntity u where u.email = :email")
+        }
+)
 public class UsersEntity implements Serializable {
 
     @Id
@@ -183,4 +188,15 @@ public class UsersEntity implements Serializable {
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(this).hashCode();
+    }
+
 }
