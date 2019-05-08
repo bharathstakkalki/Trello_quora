@@ -22,4 +22,11 @@ public class AnswerDao {
         List<AnswerEntity> answerEntities = entityManager.createNamedQuery("getAllAnswerToQuestion",AnswerEntity.class).setParameter("question",questionEntity).getResultList();
         return answerEntities;
     }
+
+    //This method takes answer entity to be persisted in the database, stores the answer and other related parameters
+    // in the answer table for a questionId and returns the created answer and other related parameters from answer table
+    public AnswerEntity createAnswer(AnswerEntity answerEntity){
+        entityManager.persist(answerEntity);
+        return answerEntity;
+    }
 }
