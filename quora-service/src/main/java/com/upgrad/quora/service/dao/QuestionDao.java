@@ -39,4 +39,11 @@ public class QuestionDao {
         List<QuestionEntity> questionEntities = entityManager.createNamedQuery("getAllQuestionsByUser",QuestionEntity.class).setParameter("userEntity",usersEntity).getResultList();
         return questionEntities;
     }
+
+    // This method persists or saves the question into the question table and then returns the QuestionEntity
+    public QuestionEntity createQuestion(final QuestionEntity questionEntity) {
+        entityManager.persist(questionEntity);
+        return questionEntity;
+    }
+
 }
