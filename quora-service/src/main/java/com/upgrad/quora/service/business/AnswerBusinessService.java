@@ -86,6 +86,7 @@ public class AnswerBusinessService {
         //updating the entity with parametes like date and user...
         ansEditEntity.setDate(ZonedDateTime.now());
         ansEditEntity.setUser(userAuthEntity.getUser());
+        ansEditEntity.setQuestion(answerEntity.getQuestion());
         return answerDao.editAnsContents(ansEditEntity);
 
     }
