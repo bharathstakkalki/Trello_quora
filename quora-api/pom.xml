@@ -12,6 +12,7 @@
     <artifactId>quora-api</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -36,6 +37,7 @@
             <version>2.6.1</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>com.upgrad.quora</groupId>
             <artifactId>quora-service</artifactId>
