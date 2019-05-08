@@ -6,6 +6,7 @@ import com.upgrad.quora.service.entity.QuestionEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -22,4 +23,22 @@ public class AnswerDao {
         List<AnswerEntity> answerEntities = entityManager.createNamedQuery("getAllAnswerToQuestion",AnswerEntity.class).setParameter("question",questionEntity).getResultList();
         return answerEntities;
     }
+
+    public AnswerEntity getAnswerByAnswerUuid(String answerUuid){
+        try {
+            AnswerEntity answerEntity = entityManager.createNamedQuery("getAnswerByAnswerUuid", AnswerEntity.class).setParameter("answerUuid", answerUuid).getSingleResult();
+            return answerEntity;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
+    //Method to update / edit the answer. Takes the answer to be updated and all other entity parameters and updates into the answer table in the database and
+    //returns the updated record from answer table.
+    public AnswerEntity editAnsContents(AnswerEntity ansEditEntity){
+        entityManager.merge(ansEditEntity);
+        return ansEditEntity;
+    }
+
 }
+

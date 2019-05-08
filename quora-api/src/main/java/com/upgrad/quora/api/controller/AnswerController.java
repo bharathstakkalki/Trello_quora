@@ -1,8 +1,11 @@
 package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.AnswerDetailsResponse;
+import com.upgrad.quora.api.model.AnswerEditRequest;
+import com.upgrad.quora.api.model.AnswerEditResponse;
 import com.upgrad.quora.service.business.AnswerBusinessService;
 import com.upgrad.quora.service.entity.AnswerEntity;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 //This Controller class deals with all the request related to question.
 
@@ -45,5 +50,27 @@ public class AnswerController {
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
     }
 
+    //This end point is for editing an answer.
+    //It allows editing only to the answer owner
+    //This method returns the edited answer in the form of JSON response model AnswerEditResponse with Http status
+    //Method takes JSON request model from client, path variable answerId and the authorization and passes it to service layer for authentication.
+    //Also it handles AuthorizationFailedExceptions & AnswerNotFoundException and returns them with appropriate messages & codes
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerEditResponse> editAnswerContent(final AnswerEditRequest answerEditRequest, @PathVariable(value = "answerId") final String answerId,
+                                                                @RequestHeader(value = "authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
+
+        //This code transforms JSON model to entity model
+        AnswerEntity ansEditEntity = new AnswerEntity();
+        ansEditEntity.setUuid(UUID.randomUUID().toString());
+        ansEditEntity.setAns(answerEditRequest.getContent());
+        ansEditEntity.setDate(ZonedDateTime.now());
+
+        AnswerEntity ansEdited = answerBusinessService.editAnsContents(ansEditEntity, answerId, authorization);
+
+        final AnswerEditResponse answerEditResponse = new AnswerEditResponse().id(ansEdited.getUuid()).status("ANSWER EDITED");
+
+        return new ResponseEntity<AnswerEditResponse>(answerEditResponse, HttpStatus.OK);
+    }
 
 }
