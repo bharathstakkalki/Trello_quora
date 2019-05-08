@@ -1,6 +1,8 @@
 package com.upgrad.quora.service.entity;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -10,11 +12,14 @@ import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "user_auth", schema = "quora")
+@Table(name = "user_auth")
+@NamedQueries({
+        @NamedQuery(name = "userAuthTokenByAccessToken", query = "select ut from UserAuthEntity ut where ut.accessToken = :accessToken")
+})
 public class UserAuthEntity {
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -23,23 +28,23 @@ public class UserAuthEntity {
     private String uuid;
 
     @ManyToOne()
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UsersEntity user;
 
-    @Column(name = "ACCESS_TOKEN")
+    @Column(name = "access_token")
     @Size(max = 500)
     @NotNull
     private String accessToken;
 
-    @Column(name = "EXPIRES_AT")
+    @Column(name = "expires_at")
     @NotNull
     private ZonedDateTime expiresAt;
 
-    @Column(name = "LOGOUT_AT")
+    @Column(name = "logout_at")
     private ZonedDateTime logoutAt;
 
-    @Column(name = "LOGIN_AT")
+    @Column(name = "login_at")
     @NotNull
     private ZonedDateTime loginAt;
 
@@ -98,5 +103,16 @@ public class UserAuthEntity {
     public void setLoginAt(ZonedDateTime loginAt) {
         this.loginAt = loginAt;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(this).hashCode();
+    }
+
 }
 

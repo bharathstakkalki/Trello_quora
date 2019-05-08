@@ -1,16 +1,26 @@
 package com.upgrad.quora.service.entity;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "users", schema = "quora", uniqueConstraints ={@UniqueConstraint(columnNames = {"userName","email"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"userName", "email"})})
 
-public class UsersEntity {
+@NamedQueries(
+        {
+                @NamedQuery(name = "userByUuid", query = "select u from UsersEntity u where u.uuid = :uuid"),
+                @NamedQuery(name = "userByUsername", query = "select u from UsersEntity u where u.userName = :username"),
+                @NamedQuery(name = "userByEmail", query = "select u from UsersEntity u where u.email = :email")
+        }
+)
+public class UsersEntity implements Serializable {
 
     @Id
     @Column(name = "id")
@@ -18,21 +28,21 @@ public class UsersEntity {
     private Integer id;
 
     @Column(name = "uuid")
-    @Size( max = 200)
+    @Size(max = 200)
     @NotNull
     private String uuid;
 
-    @Column(name = "firstName")
+    @Column(name = "firstname")
     @Size(max = 30)
     @NotNull
     private String firstName;
 
-    @Column(name = "lastName")
+    @Column(name = "lastname")
     @Size(max = 30)
     @NotNull
     private String lastName;
 
-    @Column(name = "userName")
+    @Column(name = "username")
     @Size(max = 30)
     @NotNull
     private String userName;
@@ -58,7 +68,7 @@ public class UsersEntity {
     @Size(max = 30)
     private String country;
 
-    @Column(name = "aboutMe")
+    @Column(name = "aboutme")
     @Size(max = 50)
     private String aboutMe;
 
@@ -70,7 +80,7 @@ public class UsersEntity {
     @Size(max = 30)
     private String role;
 
-    @Column(name = "contactNumber")
+    @Column(name = "contactnumber")
     @Size(max = 30)
     private String contactNumber;
 
@@ -178,4 +188,15 @@ public class UsersEntity {
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(this).hashCode();
+    }
+
 }
