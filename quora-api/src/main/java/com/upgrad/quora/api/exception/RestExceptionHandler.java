@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import static jdk.nashorn.internal.runtime.regexp.joni.constants.CCVALTYPE.SB;
+
 
 // This class is created to handle the exception from the controller class.
 // The error response is created as per the exception and are returned.
