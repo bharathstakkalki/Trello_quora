@@ -1,10 +1,11 @@
 package com.upgrad.quora.api.controller;
 
 
-import com.upgrad.quora.api.model.QuestionDetailsResponse;
+import com.upgrad.quora.api.model.*;
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 
 //This Controller class deals with all the request related to question.
@@ -71,5 +74,46 @@ public class QuestionController {
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionDetailsResponseList, HttpStatus.OK);
 
     }
+
+    // This Request handler method is used to handle Http requests of Post type. It receives the question entered by the user,
+    // creates the QuestionEntity object and correspondingly calls the createQuestion() in QuestionBusinessService class
+    // Exceptions arising due to scenarios when a user who isn't signed in, or has signed out tries to create a question has been handled
+    @RequestMapping(method = RequestMethod.POST, path="/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionResponse> createQuestion(final QuestionRequest questionRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setContent(questionRequest.getContent());
+        questionEntity.setDate(ZonedDateTime.now());
+        questionEntity.setUuid(UUID.randomUUID().toString());
+        QuestionEntity createdQuestion = questionBusinessService.createQuestion(questionEntity, authorization);
+        QuestionResponse questionResponse = new QuestionResponse().id(createdQuestion.getUuid()).status("QUESTION CREATED");
+        return  new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
+
+    }
+
+    // This Request handler method is used to handle Http requests of Put type. It receives the content that needs to be edited,
+    // the uuid of the question to be edited and the Authorization details (in the header) pertaining to the logged in user.
+    // A QuestionEntity object is created that stored the details present in the QuestionEditRequest and is sent to editQuestion() in
+    // QuestionBusinessService class to update the corresponding record in the database
+    @RequestMapping(method = RequestMethod.PUT, path = "/question/edit/{question_id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionEditResponse> editQuesttion(final QuestionEditRequest questionEditRequest, @PathVariable(value = "question_id") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setContent(questionEditRequest.getContent());
+        questionEntity.setDate(ZonedDateTime.now());
+        QuestionEntity editedQuestion = questionBusinessService.editQuestion(questionEntity, questionId, authorization);
+        QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
+        return new ResponseEntity<QuestionEditResponse>(questionEditResponse, HttpStatus.OK);
+
+    }
+
+    // This request handler method is used to handle http requests of Delete type. It receives the question id to be deleted
+    // and the access token (in the header) pertaining to the logged in user. This is passed to the deleteQuestion() in the QuestionBusinessService
+    // class which in turn deletes the entry from the database and returns the QuestionEntity object
+    @RequestMapping(method = RequestMethod.DELETE, path = "/question/delete/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@PathVariable(value = "questionId") final String questionId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity deletedQuestion = questionBusinessService.deleteQuestion(questionId, authorization);
+        QuestionDeleteResponse questionDeleteResponse = new QuestionDeleteResponse().id(deletedQuestion.getUuid()).status("QUESTION DELETED");
+        return new ResponseEntity<QuestionDeleteResponse>(questionDeleteResponse, HttpStatus.OK);
+    }
+
 
 }
