@@ -6,11 +6,16 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "users", schema = "quora", uniqueConstraints ={@UniqueConstraint(columnNames = {"userName","email"})})
+@Table(name = "users", uniqueConstraints ={@UniqueConstraint(columnNames = {"userName","email"})})
 
-public class UsersEntity {
+@NamedQueries(
+                {@NamedQuery(name = "userByUuid", query = "select u from UsersEntity u where u.uuid = :uuid")}
+
+                 )
+public class UsersEntity implements Serializable {
 
     @Id
     @Column(name = "id")
@@ -22,17 +27,17 @@ public class UsersEntity {
     @NotNull
     private String uuid;
 
-    @Column(name = "firstName")
+    @Column(name = "firstname")
     @Size(max = 30)
     @NotNull
     private String firstName;
 
-    @Column(name = "lastName")
+    @Column(name = "lastname")
     @Size(max = 30)
     @NotNull
     private String lastName;
 
-    @Column(name = "userName")
+    @Column(name = "username")
     @Size(max = 30)
     @NotNull
     private String userName;
@@ -58,7 +63,7 @@ public class UsersEntity {
     @Size(max = 30)
     private String country;
 
-    @Column(name = "aboutMe")
+    @Column(name = "aboutme")
     @Size(max = 50)
     private String aboutMe;
 
@@ -70,7 +75,7 @@ public class UsersEntity {
     @Size(max = 30)
     private String role;
 
-    @Column(name = "contactNumber")
+    @Column(name = "contactnumber")
     @Size(max = 30)
     private String contactNumber;
 
