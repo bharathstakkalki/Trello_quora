@@ -39,4 +39,23 @@ public class QuestionDao {
         List<QuestionEntity> questionEntities = entityManager.createNamedQuery("getAllQuestionsByUser",QuestionEntity.class).setParameter("userEntity",usersEntity).getResultList();
         return questionEntities;
     }
+
+    // This method persists or saves the question into the question table and then returns the QuestionEntity
+    public QuestionEntity createQuestion(final QuestionEntity questionEntity) {
+        entityManager.persist(questionEntity);
+        return questionEntity;
+    }
+
+    // This method updates the question in the question table
+    public QuestionEntity editQuestion(final QuestionEntity questionEntity) {
+        entityManager.merge(questionEntity);
+        return questionEntity;
+    }
+
+    // This method deletes the corresponding question entry from the database and returns the questionEntity
+    public QuestionEntity deleteQuestion(final QuestionEntity questionEntity) {
+        entityManager.remove(questionEntity);
+        return questionEntity;
+    }
+
 }
