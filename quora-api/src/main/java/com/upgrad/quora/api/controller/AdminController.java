@@ -1,6 +1,5 @@
 package com.upgrad.quora.api.controller;
 
-
 import com.upgrad.quora.api.model.UserDeleteResponse;
 import com.upgrad.quora.service.business.AdminBusinessService;
 import com.upgrad.quora.service.entity.UsersEntity;
