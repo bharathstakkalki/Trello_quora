@@ -71,8 +71,7 @@ public class AnswerBusinessService {
             throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
         }
 
-
-        //Checks whether user is signed in..??
+       //Checks whether user is signed in..??
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
 
         if (userAuthEntity == null) {
@@ -81,13 +80,13 @@ public class AnswerBusinessService {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to delete an answer");
         }
         //check for user willing to delete the answer is admin OR the answer owner??
+
         String role = userAuthEntity.getUser().getRole();
         if (role.equals("admin") || (answerEntity.getUser().equals(userAuthEntity.getUser()))) {
-            AnswerEntity deletedAns = answerDao.deleteAnswer(answerUuid);
+            AnswerEntity deletedAns = answerDao.deleteAnswer(answerEntity);
             return deletedAns;
         }
         throw new AuthorizationFailedException("ATHR-003", "Only the answer owner or admin can delete the answer");
     }
-
 
 }

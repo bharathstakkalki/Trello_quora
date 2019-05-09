@@ -37,13 +37,9 @@ public class AnswerDao {
     //Method removes/deletes the record from the database and returns the deleted record
     //takes the answerId checks for the database record and then removes it
 
-    public AnswerEntity deleteAnswer(String answerUuid){
-        try{
-            AnswerEntity deletedAns = entityManager.createNamedQuery("getAnswerByAnswerUuid", AnswerEntity.class).setParameter("answerUuid", answerUuid).getSingleResult();
-            entityManager.remove(deletedAns);
-            return deletedAns;
-        } catch(NoResultException nre){
-            return null;
+    public AnswerEntity deleteAnswer(final AnswerEntity deleteAnsEntity){
+        entityManager.remove(deleteAnsEntity);
+        return deleteAnsEntity;
         }
     }
-}
+
