@@ -8,11 +8,4 @@
       <module name="quora-service" target="1.8" />
     </bytecodeTargetLevel>
   </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="quora-api" options="" />
-      <module name="quora-db" options="-parameters" />
-      <module name="quora-service" options="" />
-    </option>
-  </component>
 </project>
