@@ -145,7 +145,7 @@ public class AnswerBusinessService {
             //check for user willing to delete the answer is admin OR the answer owner??
 
             String role = userAuthEntity.getUser().getRole();
-                if (role.equals("admin") || (answerEntity.getUser().equals(userAuthEntity.getUser()))) {
+                if (role.equals("admin") || (answerEntity.getUser() == userAuthEntity.getUser())) {
                AnswerEntity deletedAns = answerDao.deleteAnswer(answerEntity);
                return deletedAns;
              }
