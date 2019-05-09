@@ -24,12 +24,14 @@ public class AnswerDao {
         return answerEntities;
     }
 
+
     //This method takes answer entity to be persisted in the database, stores the answer and other related parameters
     // in the answer table for a questionId and returns the created answer and other related parameters from answer table
     public AnswerEntity createAnswer(AnswerEntity answerEntity){
         entityManager.persist(answerEntity);
         return answerEntity;
     }
+
 
     public AnswerEntity getAnswerByAnswerUuid(String answerUuid){
         try {
@@ -40,6 +42,7 @@ public class AnswerDao {
         }
     }
 
+
     //Method to update / edit the answer. Takes the answer to be updated and all other entity parameters and updates into the answer table in the database and
     //returns the updated record from answer table.
     public AnswerEntity editAnsContents(final AnswerEntity ansEditEntity){
@@ -47,5 +50,13 @@ public class AnswerDao {
         return ansEditEntity;
     }
 
-}
+    //Method removes/deletes the record from the database and returns the deleted record
+    //takes the answerId checks for the database record and then removes it
+
+    public AnswerEntity deleteAnswer(final AnswerEntity deleteAnsEntity){
+        entityManager.remove(deleteAnsEntity);
+        return deleteAnsEntity;
+        }
+    }
+
 

@@ -58,7 +58,7 @@ public class AnswerBusinessService {
         return answerEntities;
     }
 
-<<<<<<< HEAD
+
     // Method checks for different conditions for creating answer to the particular question
     //it takes the questionId whose answer is to be created, the answer entity and authorization details passed by controller
     @Transactional(propagation = Propagation.REQUIRED)
@@ -81,16 +81,19 @@ public class AnswerBusinessService {
         return answerDao.createAnswer(answerEntity);
     }
 
-=======
+
     //This method takes answer entity, answerId and authorization information from controller class and returns edited answerentity
     @Transactional(propagation = Propagation.REQUIRED)
     public AnswerEntity editAnsContents(AnswerEntity ansEditEntity, final String answerUuid, final String authorizationToken) throws AuthorizationFailedException, AnswerNotFoundException {
 
-        //This code checks if user is not signed in
+
+        //Checks whether user is signed in..??
+
         UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
 
         if (userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+
         } else if (userAuthEntity.getLogoutAt() != null) {              //checking if user is signed out
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to edit an answer");
         }
@@ -101,6 +104,7 @@ public class AnswerBusinessService {
         if (answerEntity == null) {
             throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
         } else
+
             //Check for the logged in user whether is answer owner??
             if (userAuthEntity.getUser() != answerEntity.getUser()) {
                 throw new AuthorizationFailedException("ATHR-003", "Only the answer owner can edit the answer");
@@ -112,7 +116,41 @@ public class AnswerBusinessService {
                 return answerDao.editAnsContents(answerEntity);
 
             }
-
     }
->>>>>>> SB.EditAnswer
+
+       //This method is used to check different conditions before the record is actually deleted from database
+        //It takes tha answerId and the authorization parameters to perform various checks
+        //And returns the deleted record to the controller class
+        //Also if conditions are not favorable throws exceptions
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        public AnswerEntity deleteAnswer(final String answerUuid, final String authorizationToken) throws
+        AuthorizationFailedException, AnswerNotFoundException {
+
+            //Code checks whether the answer to be deleted is exist in the database OR not??
+            AnswerEntity answerEntity = answerDao.getAnswerByAnswerUuid(answerUuid);
+            if (answerEntity == null) {
+                throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
+            }
+
+            //This code checks if user is not signed in
+            UserAuthEntity userAuthEntity = userAuthDao.getAuthToken(authorizationToken);
+
+            if (userAuthEntity == null) {
+                throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+            } else if (userAuthEntity.getLogoutAt() != null) {    //checking if user is signed out
+                throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to delete an answer");
+            }
+
+            //check for user willing to delete the answer is admin OR the answer owner??
+
+            String role = userAuthEntity.getUser().getRole();
+                if (role.equals("admin") || (answerEntity.getUser().equals(userAuthEntity.getUser()))) {
+               AnswerEntity deletedAns = answerDao.deleteAnswer(answerEntity);
+               return deletedAns;
+             }
+                throw new AuthorizationFailedException("ATHR-003", "Only the answer owner or admin can delete the answer");
+    }
 }
+
+
